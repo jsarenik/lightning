@@ -1,4 +1,5 @@
 #include <bitcoin/privkey.h>
+#include <wally_bip39.h>
 #include <ccan/crypto/hkdf_sha256/hkdf_sha256.h>
 #include <ccan/err/err.h>
 #include <ccan/noerr/noerr.h>
@@ -16,6 +17,7 @@
 #include <sodium.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <termios.h>
 
 #define ERROR_HSM_FILE errno
 #define ERROR_USAGE 2
@@ -33,6 +35,7 @@ static void show_usage(const char *progname)
 	       "<path/to/hsm_secret> [hsm_secret password]\n");
 	printf("	- guesstoremote <P2WPKH address> <node id> <tries> "
 	       "<path/to/hsm_secret> [hsm_secret password]\n");
+	printf("	- generatehsm <path/to/hsm_secret>\n");
 	exit(0);
 }
 
@@ -368,6 +371,91 @@ static int guess_to_remote(const char *address, struct node_id *node_id,
 	return 1;
 }
 
+static void read_mnemonic(char *mnemonic) {
+	printf("Introduce the BIP39 24 word list:\n");
+	char word[50];
+	uint n_words;
+	for (n_words = 0; n_words < 24; n_words++) {
+		scanf("%s", word);
+		/* We need to concat the strings using ' ' so libwally can
+		 * validate it */
+		if (n_words == 0) {
+			strcpy(mnemonic, word);
+		} else {
+			strcat(mnemonic, " ");
+			strcat(mnemonic, word);
+		}
+	}
+	/* scanf() leaves the newline character in the input buffer */
+	getchar();
+}
+
+static void read_passphrase(char *passphrase) {
+	struct termios current_term, temp_term;
+	printf("Warning: remember that different passphrase yield different "
+	       "bitcoin wallets.\n");
+	printf("Leave it empty for using the value by default (echo is "
+	       "disabled now).\n");
+	printf("Enter your passphrase: ");
+
+	/* Change terminal options so we do not echo the passphrase */
+	if (tcgetattr(fileno(stdin), &current_term) != 0)
+		errx(ERROR_USAGE, "Could not get current terminal options.");
+	temp_term = current_term;
+	temp_term.c_lflag &= ~ECHO;
+	if (tcsetattr(fileno(stdin), TCSAFLUSH, &temp_term) != 0)
+		errx(ERROR_USAGE, "Could not disable passphrase echoing.");
+	/* If we don't flush we might end up being buffered and we might seem
+	 * to hang while we wait for the password. */
+	fflush(stdout);
+
+	size_t passphrase_size;
+	if (getline(&passphrase, &passphrase_size, stdin) < 0)
+		errx(ERROR_USAGE, "Could not read passphrase from stdin.");
+	printf("passphrase size: %ld\n", passphrase_size);
+	/* Replace the last character which will always be '\n' */
+	passphrase[strlen(passphrase) - 1] = '\0';
+
+	if (tcsetattr(fileno(stdin), TCSAFLUSH, &current_term) != 0)
+		errx(ERROR_USAGE, "Could not restore terminal options.");
+}
+
+static int generate_hsm(const char *hsm_secret_path)
+{
+	char mnemonic[BIP39_WORDLIST_LEN];
+	read_mnemonic(mnemonic);
+	if (bip39_mnemonic_validate(NULL, mnemonic) != 0)
+		errx(ERROR_USAGE, "Invalid mnemonic");
+	
+	char *passphrase = NULL;
+	read_passphrase(passphrase);
+
+	u8 bip32_seed[BIP39_SEED_LEN_512];
+	size_t bip32_seed_len;
+
+	if (bip39_mnemonic_to_seed(mnemonic, passphrase, bip32_seed, sizeof(bip32_seed), &bip32_seed_len) != WALLY_OK)
+		errx(ERROR_LIBWALLY, "Unable to derive BIP32 seed from BIP39 mnemonic");
+	
+
+	int fd = open(hsm_secret_path, O_CREAT|O_EXCL|O_WRONLY, 0400);
+	if (fd < 0) {
+		errx(ERROR_USAGE, "Unable to create hsm_secret file");
+	}
+	if (!write_all(fd, bip32_seed, bip32_seed_len))
+		errx(ERROR_USAGE, "Error writing secret to hsm_secret file");
+
+	if (fsync(fd) != 0)
+		errx(ERROR_USAGE, "Error fsycning hsm_secret file");
+
+	/* This should never fail if fsync succeeded. But paranoia is good, and bugs exist */
+	if (close(fd) != 0) 
+		errx(ERROR_USAGE, "Error closing hsm_secret file");
+	
+	printf("New hsm_secret file created. Use hsmtool to encrypt the BIP32 seed if needed");
+
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	const char *method;
@@ -411,6 +499,21 @@ int main(int argc, char *argv[])
 			errx(ERROR_USAGE, "Bad node id");
 		return guess_to_remote(argv[2], &node_id, atol(argv[4]),
 		                       argv[5], argc >= 7 ? argv[6] : NULL);
+	}
+
+	if (streq(method, "generatehsm")) {
+		if ( argc != 3)
+			show_usage(argv[0]);
+
+		char *hsm_secret_path = argv[2];
+
+		/* if hsm_secred already exists we abort the process
+		 * we do not want to lose someone else's funds */
+		struct stat st;
+		if (stat(hsm_secret_path, &st) == 0)
+			errx(ERROR_USAGE, "hsm_secret file already exists");
+
+		return generate_hsm(hsm_secret_path);
 	}
 
 	show_usage(argv[0]);
