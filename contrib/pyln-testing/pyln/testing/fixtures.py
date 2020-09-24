@@ -121,6 +121,9 @@ def bitcoind(directory, teardown_checks):
         raise ValueError("bitcoind is too old. At least version 16000 (v0.16.0)"
                          " is needed, current version is {}".format(info['version']))
 
+    if info['version'] > 200100:
+        bitcoind.rpc.createwallet("test")
+
     info = bitcoind.rpc.getblockchaininfo()
     # Make sure we have some spendable funds
     if info['blocks'] < 101:
