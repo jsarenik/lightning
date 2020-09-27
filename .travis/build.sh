@@ -42,6 +42,10 @@ if [ "$NO_PYTHON" != 1 ]; then
 
     pip3 install --user -U --quiet --progress-bar off \
 	 pip \
+	 pytest==3.0.5 \
+	 pytest-rerunfailures==3.1 \
+	 pytest-xdist==1.22.2 \
+	 ephemeral-port-reserve==1.1.0 \
 	 pytest-test-groups==1.0.3
 
     pip3 install --user -U --quiet --progress-bar off \
