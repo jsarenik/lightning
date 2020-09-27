@@ -52,11 +52,11 @@ if [ "$NO_PYTHON" != 1 ]; then
 
     pip3 install --user -U --quiet --progress-bar off \
 	 pytest-sentry \
-	 pytest-rerunfailures
+	 pytest-dynamicrerun
 
    cat > pytest.ini << EOF
 [pytest]
-addopts=-p no:logging --color=no --reruns=2 -x
+addopts=-p no:logging --color=no --dynamic-rerun-attempts=2 -x
 EOF
 fi
 
