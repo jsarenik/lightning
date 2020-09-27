@@ -38,7 +38,7 @@ if [ ! -f dependencies/bin/bitcoind ]; then
 fi
 
 if [ "$NO_PYTHON" != 1 ]; then
-    pyenv global 3.7
+    pyenv global 3.6
 
     pip3 install --user -U --quiet --progress-bar off \
 	 pip \
