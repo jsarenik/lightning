@@ -51,12 +51,11 @@ if [ "$NO_PYTHON" != 1 ]; then
 	 -r contrib/pyln-testing/requirements.txt
 
     pip3 install --user -U --quiet --progress-bar off \
-	 pytest-sentry \
-	 pytest-rerunfailures
+	 pytest-sentry
 
    cat > pytest.ini << EOF
 [pytest]
-addopts=-p no:logging --color=no --reruns=2 -x
+addopts=-p no:logging --color=no -x --looponfail
 EOF
 fi
 
