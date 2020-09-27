@@ -47,4 +47,4 @@ cache:
     - dependencies
 
 script:
-  .travis/build.sh
+  tools/ltw.sh 3600 .travis/build.sh
