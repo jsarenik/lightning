@@ -357,6 +357,11 @@ class BitcoinD(TailableProc):
         TailableProc.start(self)
         self.wait_for_log("Done loading", timeout=TIMEOUT)
 
+        info = self.rpc.getnetworkinfo()
+
+        if info['version'] > 200100:
+            self.rpc.createwallet("test")
+
         logging.info("BitcoinD started")
 
     def stop(self):
