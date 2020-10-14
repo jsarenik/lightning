@@ -33,4 +33,12 @@ enum channel_state {
 };
 #define CHANNEL_STATE_MAX CLOSED
 
+enum state_change {
+	REASON_UNKNOWN,  /* anything other than the reasons below */
+	REASON_LOCAL,    /* known internal reasons, i.e. a failed HTLC */
+	REASON_USER,     /* the operator or a plugin opened or closed a channel by 'hand' */
+	REASON_REMOTE,   /* the remote bilateral close or funded a channel with us */
+	REASON_ONCHAIN   /* something happened onchain that forces us to change the state */
+};
+
 #endif /* LIGHTNING_LIGHTNINGD_CHANNEL_STATE_H */
