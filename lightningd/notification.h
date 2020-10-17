@@ -65,7 +65,8 @@ void notify_channel_state_changed(struct lightningd *ld,
 				  struct short_channel_id *scid,
 				  enum channel_state old_state,
 				  enum channel_state new_state,
-				  enum state_change cause);
+				  enum state_change cause,
+				  char *message);
 
 void notify_forward_event(struct lightningd *ld,
 			  const struct htlc_in *in,

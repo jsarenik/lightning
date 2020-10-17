@@ -76,7 +76,8 @@ void channel_set_billboard(struct channel *channel UNNEEDED, bool perm UNNEEDED,
 void channel_set_state(struct channel *channel UNNEEDED,
 		       enum channel_state old_state UNNEEDED,
 		       enum channel_state state UNNEEDED,
-		       enum state_change reason UNNEEDED)
+		       enum state_change reason UNNEEDED,
+		       char *why UNNEEDED)
 { fprintf(stderr, "channel_set_state called!\n"); abort(); }
 /* Generated stub for channel_state_name */
 const char *channel_state_name(const struct channel *channel UNNEEDED)

@@ -140,7 +140,8 @@ static void peer_closing_complete(struct channel *channel, const u8 *msg)
 	channel_set_state(channel,
 			  CLOSINGD_SIGEXCHANGE,
 			  CLOSINGD_COMPLETE,
-			  REASON_UNKNOWN);
+			  REASON_UNKNOWN,
+			  "Closing complete");
 }
 
 static unsigned closing_msg(struct subd *sd, const u8 *msg, const int *fds UNUSED)

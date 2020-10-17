@@ -139,7 +139,8 @@ static void lockin_complete(struct channel *channel)
 	channel_set_state(channel,
 			  CHANNELD_AWAITING_LOCKIN,
 			  CHANNELD_NORMAL,
-			  REASON_UNKNOWN);
+			  REASON_UNKNOWN,
+			  "Lockin complete");
 
 	/* Fees might have changed (and we use IMMEDIATE once we're funded),
 	 * so update now. */
@@ -239,7 +240,8 @@ static void peer_got_shutdown(struct channel *channel, const u8 *msg)
 		channel_set_state(channel,
 				  channel->state,
 				  CHANNELD_SHUTTING_DOWN,
-				  REASON_REMOTE);
+				  REASON_REMOTE,
+				  "Peer closes channel");
 
 	/* TODO(cdecker) Selectively save updated fields to DB */
 	wallet_channel_save(ld->wallet, channel);
@@ -295,7 +297,8 @@ static void peer_start_closingd_after_shutdown(struct channel *channel,
 	channel_set_state(channel,
 			  CHANNELD_SHUTTING_DOWN,
 			  CLOSINGD_SIGEXCHANGE,
-			  REASON_UNKNOWN);
+			  REASON_UNKNOWN,
+			  "Start closingd");
 }
 
 static void forget(struct channel *channel)

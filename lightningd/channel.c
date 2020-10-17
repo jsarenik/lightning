@@ -426,7 +426,8 @@ void channel_set_last_tx(struct channel *channel,
 void channel_set_state(struct channel *channel,
 		       enum channel_state old_state,
 		       enum channel_state state,
-		       enum state_change reason)
+		       enum state_change reason,
+		       char *why)
 {
 	struct channel_id cid;
 
@@ -463,7 +464,8 @@ void channel_set_state(struct channel *channel,
 					     channel->scid,
 					     old_state,
 					     state,
-					     reason);
+					     reason,
+					     why);
 	}
 }
 
@@ -508,7 +510,8 @@ void channel_fail_permanent(struct channel *channel,
 		channel_set_state(channel,
 				  channel->state,
 				  AWAITING_UNILATERAL,
-				  reason);
+				  reason,
+				  why);
 
 	tal_free(why);
 }

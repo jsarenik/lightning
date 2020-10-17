@@ -441,7 +441,8 @@ void notify_channel_state_changed(struct lightningd *ld UNNEEDED,
 				  struct short_channel_id *scid UNNEEDED,
 				  enum channel_state old_state UNNEEDED,
 				  enum channel_state new_state UNNEEDED,
-				  enum state_change reason UNNEEDED)
+				  enum state_change cause UNNEEDED,
+				  char *message UNNEEDED)
 { fprintf(stderr, "notify_channel_state_changed called!\n"); abort(); }
 /* Generated stub for notify_connect */
 void notify_connect(struct lightningd *ld UNNEEDED, struct node_id *nodeid UNNEEDED,

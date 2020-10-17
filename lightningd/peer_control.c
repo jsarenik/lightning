@@ -1524,7 +1524,8 @@ static struct command_result *json_close(struct command *cmd,
 		case CHANNELD_AWAITING_LOCKIN:
 			channel_set_state(channel,
 					  channel->state, CHANNELD_SHUTTING_DOWN,
-					  REASON_USER);
+					  REASON_USER,
+					  "User or plugin invoked close command");
 			/* fallthrough */
 		case CHANNELD_SHUTTING_DOWN:
 			if (channel->owner)
