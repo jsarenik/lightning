@@ -658,6 +658,7 @@ def test_channel_state_changed_bilateral(node_factory, bitcoind):
     assert(event1['old_state'] == "CHANNELD_AWAITING_LOCKIN")
     assert(event1['new_state'] == "CHANNELD_NORMAL")
     assert(event1['cause'] == "USER")
+    assert(event1['message'] == "Lockin complete")
     event2 = wait_for_event(l2)
     assert(event2['peer_id'] == l1_id)
     assert(event2['channel_id'] == cid)
@@ -665,6 +666,7 @@ def test_channel_state_changed_bilateral(node_factory, bitcoind):
     assert(event2['old_state'] == "CHANNELD_AWAITING_LOCKIN")
     assert(event2['new_state'] == "CHANNELD_NORMAL")
     assert(event2['cause'] == "REMOTE")
+    assert(event2['message'] == "Lockin complete")
 
     # close channel and look for stateful events
     l1.rpc.close(scid)
@@ -673,28 +675,34 @@ def test_channel_state_changed_bilateral(node_factory, bitcoind):
     assert(event1['old_state'] == "CHANNELD_NORMAL")
     assert(event1['new_state'] == "CHANNELD_SHUTTING_DOWN")
     assert(event1['cause'] == "USER")
+    assert(event1['message'] == "User or plugin invoked close command")
     event2 = wait_for_event(l2)
     assert(event2['old_state'] == "CHANNELD_NORMAL")
     assert(event2['new_state'] == "CHANNELD_SHUTTING_DOWN")
     assert(event2['cause'] == "REMOTE")
+    assert(event2['message'] == "Peer closes channel")
 
     event1 = wait_for_event(l1)
     assert(event1['old_state'] == "CHANNELD_SHUTTING_DOWN")
     assert(event1['new_state'] == "CLOSINGD_SIGEXCHANGE")
     assert(event1['cause'] == "USER")
+    assert(event1['message'] == "Start closingd")
     event2 = wait_for_event(l2)
     assert(event2['old_state'] == "CHANNELD_SHUTTING_DOWN")
     assert(event2['new_state'] == "CLOSINGD_SIGEXCHANGE")
     assert(event2['cause'] == "REMOTE")
+    assert(event2['message'] == "Start closingd")
 
     event1 = wait_for_event(l1)
     assert(event1['old_state'] == "CLOSINGD_SIGEXCHANGE")
     assert(event1['new_state'] == "CLOSINGD_COMPLETE")
     assert(event1['cause'] == "USER")
+    assert(event1['message'] == "Closing complete")
     event2 = wait_for_event(l2)
     assert(event2['old_state'] == "CLOSINGD_SIGEXCHANGE")
     assert(event2['new_state'] == "CLOSINGD_COMPLETE")
     assert(event2['cause'] == "REMOTE")
+    assert(event2['message'] == "Closing complete")
 
     bitcoind.generate_block(100)  # so it gets settled
 
@@ -702,19 +710,23 @@ def test_channel_state_changed_bilateral(node_factory, bitcoind):
     assert(event1['old_state'] == "CLOSINGD_COMPLETE")
     assert(event1['new_state'] == "FUNDING_SPEND_SEEN")
     assert(event1['cause'] == "USER")
+    assert(event1['message'] == "Onchain funding spend")
     event2 = wait_for_event(l2)
     assert(event2['old_state'] == "CLOSINGD_COMPLETE")
     assert(event2['new_state'] == "FUNDING_SPEND_SEEN")
     assert(event2['cause'] == "REMOTE")
+    assert(event2['message'] == "Onchain funding spend")
 
     event1 = wait_for_event(l1)
     assert(event1['old_state'] == "FUNDING_SPEND_SEEN")
     assert(event1['new_state'] == "ONCHAIN")
     assert(event1['cause'] == "USER")
+    assert(event1['message'] == "Onchain init reply")
     event2 = wait_for_event(l2)
     assert(event2['old_state'] == "FUNDING_SPEND_SEEN")
     assert(event2['new_state'] == "ONCHAIN")
     assert(event2['cause'] == "REMOTE")
+    assert(event2['message'] == "Onchain init reply")
 
 
 def test_channel_state_changed_unilateral(node_factory, bitcoind):
@@ -742,6 +754,7 @@ def test_channel_state_changed_unilateral(node_factory, bitcoind):
     assert(event2['old_state'] == "CHANNELD_AWAITING_LOCKIN")
     assert(event2['new_state'] == "CHANNELD_NORMAL")
     assert(event2['cause'] == "REMOTE")
+    assert(event2['message'] == "Lockin complete")
 
     # close channel unilaterally and look for stateful events
     l1.rpc.stop()
@@ -752,10 +765,12 @@ def test_channel_state_changed_unilateral(node_factory, bitcoind):
     assert(event2['old_state'] == "CHANNELD_NORMAL")
     assert(event2['new_state'] == "CHANNELD_SHUTTING_DOWN")
     assert(event2['cause'] == "USER")
+    assert(event2['message'] == "User or plugin invoked close command")
     event2 = wait_for_event(l2)
     assert(event2['old_state'] == "CHANNELD_SHUTTING_DOWN")
     assert(event2['new_state'] == "AWAITING_UNILATERAL")
     assert(event2['cause'] == "USER")
+    assert(event2['message'] == "Forcibly closed by `close` command timeout")
 
     bitcoind.generate_block(100)  # so it gets settled
 
@@ -763,10 +778,12 @@ def test_channel_state_changed_unilateral(node_factory, bitcoind):
     assert(event2['old_state'] == "AWAITING_UNILATERAL")
     assert(event2['new_state'] == "FUNDING_SPEND_SEEN")
     assert(event2['cause'] == "USER")
+    assert(event2['message'] == "Onchain funding spend")
     event2 = wait_for_event(l2)
     assert(event2['old_state'] == "FUNDING_SPEND_SEEN")
     assert(event2['new_state'] == "ONCHAIN")
     assert(event2['cause'] == "USER")
+    assert(event2['message'] == "Onchain init reply")
 
     # finally restart l1 and check if he sees ONCHAIN reasons for his channel
     l1.restart()
@@ -774,14 +791,17 @@ def test_channel_state_changed_unilateral(node_factory, bitcoind):
     assert(event1['old_state'] == "CHANNELD_NORMAL")
     assert(event1['new_state'] == "AWAITING_UNILATERAL")
     assert(event1['cause'] == "ONCHAIN")
+    assert(event1['message'] == "Funding transaction spent")
     event1 = wait_for_event(l1)
     assert(event1['old_state'] == "AWAITING_UNILATERAL")
     assert(event1['new_state'] == "FUNDING_SPEND_SEEN")
     assert(event1['cause'] == "ONCHAIN")
+    assert(event1['message'] == "Onchain funding spend")
     event1 = wait_for_event(l1)
     assert(event1['old_state'] == "FUNDING_SPEND_SEEN")
     assert(event1['new_state'] == "ONCHAIN")
     assert(event1['cause'] == "ONCHAIN")
+    assert(event1['message'] == "Onchain init reply")
 
 
 @unittest.skipIf(not DEVELOPER, "without DEVELOPER=1, gossip v slow")
