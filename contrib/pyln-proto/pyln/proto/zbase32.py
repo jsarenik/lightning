@@ -1,4 +1,5 @@
 import bitstring  # type: ignore
+from typing import Union
 
 
 zbase32_chars = b'ybndrfg8ejkmcpqxot1uwisza345h769'
@@ -23,7 +24,7 @@ zbase32_revchars = [
 ]
 
 
-def _message_to_bitarray(message):
+def _message_to_bitarray(message: bytes) -> bitstring.ConstBitStream:
     """Encodes a message as a bitarray with length multiple of 5."""
     barr = bitstring.ConstBitStream(message)
     padding_len = len(barr) % 5
@@ -43,7 +44,7 @@ def _bitarray_to_message(barr):
         return barr.bytes
 
 
-def _bitarray_to_u5(barr):
+def _bitarray_to_u5(barr: bitstring.ConstBitStream) -> list:
     """Converts a bitarray in a list of uint5."""
     ret = []
     while barr.pos != barr.len:
@@ -51,7 +52,7 @@ def _bitarray_to_u5(barr):
     return ret
 
 
-def _u5_to_bitarray(arr):
+def _u5_to_bitarray(arr: list) -> bitstring.BitArray:
     """Converts a list of uint5 values to a bitarray."""
     ret = bitstring.BitArray()
     for a in arr:
@@ -59,7 +60,7 @@ def _u5_to_bitarray(arr):
     return ret
 
 
-def is_zbase32_encoded(message):
+def is_zbase32_encoded(message: Union[str, bytes]) -> bool:
     """Checks if a message is zbase32 encoded."""
     if isinstance(message, str):
         message = message.encode("ASCII")
@@ -68,7 +69,7 @@ def is_zbase32_encoded(message):
     return set(message).issubset(zbase32_chars)
 
 
-def encode(message):
+def encode(message: Union[str, bytes]) -> bytes:
     """Encodes a message (str or bytes) to zbase32."""
     if isinstance(message, str):
         message = message.encode('ASCII')
@@ -81,7 +82,7 @@ def encode(message):
     return bytes(res)
 
 
-def decode(message):
+def decode(message: Union[str, bytes]) -> bytes:
     """Decodes a message (str or bytes) from zbase32."""
     if isinstance(message, str):
         message = message.encode('ASCII')
