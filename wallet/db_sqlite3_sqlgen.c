@@ -1257,6 +1257,12 @@ struct db_query db_sqlite3_queries[] = {
          .readonly = false,
     },
     {
+         .name = "SELECT timestamp, old_state, new_state, cause, message FROM state_changes WHERE channel_id = ? ORDER BY timestamp ASC;",
+         .query = "SELECT timestamp, old_state, new_state, cause, message FROM state_changes WHERE channel_id = ? ORDER BY timestamp ASC;",
+         .placeholders = 1,
+         .readonly = true,
+    },
+    {
          .name = "SELECT id FROM peers WHERE node_id = ?",
          .query = "SELECT id FROM peers WHERE node_id = ?",
          .placeholders = 1,
@@ -1678,10 +1684,10 @@ struct db_query db_sqlite3_queries[] = {
     },
 };
 
-#define DB_SQLITE3_QUERY_COUNT 278
+#define DB_SQLITE3_QUERY_COUNT 279
 
 #endif /* HAVE_SQLITE3 */
 
 #endif /* LIGHTNINGD_WALLET_GEN_DB_SQLITE3 */
 
-// SHA256STAMP:5d398c7e5e7f824db3eae12fd8b7bf8abfec47f01a9b0b485f581ff9a4acd5cb
+// SHA256STAMP:5c33a75cd316c1e6e965f7c9fd7792a03af6177644c76a58f4ae80820e916040

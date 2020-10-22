@@ -1257,6 +1257,12 @@ struct db_query db_postgres_queries[] = {
          .readonly = false,
     },
     {
+         .name = "SELECT timestamp, old_state, new_state, cause, message FROM state_changes WHERE channel_id = ? ORDER BY timestamp ASC;",
+         .query = "SELECT timestamp, old_state, new_state, cause, message FROM state_changes WHERE channel_id = $1 ORDER BY timestamp ASC;",
+         .placeholders = 1,
+         .readonly = true,
+    },
+    {
          .name = "SELECT id FROM peers WHERE node_id = ?",
          .query = "SELECT id FROM peers WHERE node_id = $1",
          .placeholders = 1,
@@ -1678,10 +1684,10 @@ struct db_query db_postgres_queries[] = {
     },
 };
 
-#define DB_POSTGRES_QUERY_COUNT 278
+#define DB_POSTGRES_QUERY_COUNT 279
 
 #endif /* HAVE_POSTGRES */
 
 #endif /* LIGHTNINGD_WALLET_GEN_DB_POSTGRES */
 
-// SHA256STAMP:5d398c7e5e7f824db3eae12fd8b7bf8abfec47f01a9b0b485f581ff9a4acd5cb
+// SHA256STAMP:5c33a75cd316c1e6e965f7c9fd7792a03af6177644c76a58f4ae80820e916040

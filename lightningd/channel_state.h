@@ -2,6 +2,8 @@
 #define LIGHTNING_LIGHTNINGD_CHANNEL_STATE_H
 #include "config.h"
 
+#include <ccan/time/time.h>
+
 /* These are in the database, so don't renumber them! */
 enum channel_state {
 	/* In channeld, still waiting for lockin. */
@@ -39,6 +41,14 @@ enum state_change {
 	REASON_USER,     /* the operator or a plugin opened or closed a channel by 'hand' */
 	REASON_REMOTE,   /* the remote bilateral close or funded a channel with us */
 	REASON_ONCHAIN   /* something happened onchain that forces us to change the state */
+};
+
+struct state_change_entry {
+	struct timeabs timestamp;
+	enum channel_state old_state;
+	enum channel_state new_state;
+	enum state_change cause;
+	char *message;
 };
 
 #endif /* LIGHTNING_LIGHTNINGD_CHANNEL_STATE_H */

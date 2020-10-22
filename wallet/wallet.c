@@ -1602,6 +1602,40 @@ void wallet_state_change_add(struct wallet *w,
 	db_exec_prepared_v2(take(stmt));
 }
 
+struct state_change_entry *wallet_state_change_get(struct wallet *w,
+						   const tal_t *ctx,
+						   u64 channel_id)
+{
+	struct db_stmt *stmt;
+	size_t count = 0;
+	struct state_change_entry *res = tal_arr(ctx,
+						 struct state_change_entry, 0);
+	stmt = db_prepare_v2(
+	    w->db, SQL("SELECT"
+		       " timestamp,"
+		       " old_state,"
+		       " new_state,"
+		       " cause,"
+		       " message "
+		       "FROM state_changes "
+		       "WHERE channel_id = ? "
+		       "ORDER BY timestamp ASC;"));
+	db_bind_int(stmt, 0, channel_id);
+	db_query_prepared(stmt);
+
+	while (db_step(stmt)) {
+		count++;
+		tal_resize(&res, count);
+		res[count-1].timestamp = db_column_timeabs(stmt, 0);
+		res[count-1].old_state = db_column_int(stmt, 1);
+		res[count-1].new_state = db_column_int(stmt, 2);
+		res[count-1].cause     = db_column_int(stmt, 3);
+		res[count-1].message   = tal_strdup(ctx, (const char *)db_column_text(stmt, 4));
+	}
+	tal_free(stmt);
+	return res;
+}
+
 static void wallet_peer_save(struct wallet *w, struct peer *peer)
 {
 	const char *addr =
