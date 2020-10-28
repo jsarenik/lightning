@@ -288,7 +288,7 @@ close_command_timeout(struct close_command *cc)
 		json_notify_fmt(cc->cmd, LOG_INFORM,
 				"Timed out, forcing close.");
 	channel_fail_permanent(cc->channel, REASON_USER,
-			       "Forcibly closed by `close` command timeout");
+			       "Forcibly closed by 'close' command timeout");
 }
 
 /* Construct a close command structure and add to ld. */
