@@ -5,14 +5,14 @@ notifications:
   email: false
 
 before_install:
-  sudo apt-get install -y libsqlite3-dev cppcheck valgrind gcc-4.8 gettext libc6-dev-armhf-cross libc6-dev-arm64-cross gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf qemu-user-static binfmt-support libsecp256k1-dev libpq-dev postgresql
+  sudo apt-get install -y libsqlite3-dev cppcheck valgrind gcc-7 gettext libc6-dev-armhf-cross libc6-dev-arm64-cross gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf qemu-user-static binfmt-support libsecp256k1-dev libpq-dev postgresql
 
 env:
   # These run superficial checks that don't take too long on their own
   - ARCH=64 TEST_CMD="make" NO_PYTHON=1
   - ARCH=64 TEST_CMD="make check-source check-units installcheck" COPTFLAGS="-O3"
   - ARCH=32 TEST_CMD="make check-source check-units installcheck" DEVELOPER=0
-  - ARCH=64 TEST_CMD="make check-source check-units installcheck" DEVELOPER=0 COMPILER=gcc-4.8
+  - ARCH=64 TEST_CMD="make check-source check-units installcheck" DEVELOPER=0 COMPILER=gcc-7
   - ARCH=64 TEST_CMD="make check-source check-units installcheck" DEVELOPER=1 EXPERIMENTAL_FEATURES=1
 
   # All of the following will just run `make pytest`
