@@ -13,6 +13,9 @@ PLUGIN_BCLI_OBJS := $(PLUGIN_BCLI_SRC:.c=.o)
 PLUGIN_KEYSEND_SRC := plugins/keysend.c
 PLUGIN_KEYSEND_OBJS := $(PLUGIN_KEYSEND_SRC:.c=.o)
 
+PLUGIN_ESPLORA_SRC := plugins/esplora.c
+PLUGIN_ESPLORA_OBJS := $(PLUGIN_ESPLORA_SRC:.c=.o)
+
 PLUGIN_LIB_SRC := plugins/libplugin.c
 PLUGIN_LIB_HEADER := plugins/libplugin.h
 PLUGIN_LIB_OBJS := $(PLUGIN_LIB_SRC:.c=.o)
@@ -70,7 +73,8 @@ PLUGINS :=					\
 	plugins/offers				\
 	plugins/pay				\
 	plugins/txprepare			\
-	plugins/spenderp
+	plugins/spenderp			\
+	plugins/esplora
 
 # Make sure these depend on everything.
 ALL_C_SOURCES += $(PLUGIN_ALL_SRC)
@@ -135,6 +139,8 @@ plugins/spenderp: bitcoin/chainparams.o bitcoin/psbt.o common/psbt_open.o $(PLUG
 plugins/offers: bitcoin/chainparams.o $(PLUGIN_OFFERS_OBJS) $(PLUGIN_LIB_OBJS) $(PLUGIN_COMMON_OBJS) common/bolt12.o common/bolt12_merkle.o common/bolt11_json.o common/iso4217.o $(WIRE_OBJS) bitcoin/block.o common/channel_id.o bitcoin/preimage.o $(JSMN_OBJS) $(CCAN_OBJS)
 
 plugins/fetchinvoice: bitcoin/chainparams.o $(PLUGIN_FETCHINVOICE_OBJS) $(PLUGIN_LIB_OBJS) $(PLUGIN_COMMON_OBJS) common/bolt12.o common/bolt12_merkle.o common/iso4217.o $(WIRE_OBJS) bitcoin/block.o common/channel_id.o bitcoin/preimage.o $(JSMN_OBJS) $(CCAN_OBJS) common/gossmap.o common/fp16.o common/dijkstra.o common/route.o common/blindedpath.o common/hmac.o common/blinding.o
+
+plugins/esplora: bitcoin/chainparams.o $(PLUGIN_ESPLORA_OBJS) $(PLUGIN_LIB_OBJS) $(PLUGIN_COMMON_OBJS) $(JSMN_OBJS) $(CCAN_OBJS)
 
 $(PLUGIN_ALL_OBJS): $(PLUGIN_LIB_HEADER)
 

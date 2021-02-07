@@ -57,6 +57,7 @@ contrib/pyln-*/pyln_*.egg-info/
 plugins/fetchinvoice
 plugins/offers
 plugins/keysend
+plugins/esplora
 release/
 tests/plugins/test_selfdisable_after_getmanifest
 devtools/route
