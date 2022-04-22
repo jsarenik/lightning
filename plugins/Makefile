@@ -30,7 +30,10 @@ PLUGIN_OFFERS_HEADER := $(PLUGIN_OFFERS_SRC:.c=.h)
 
 PLUGIN_FETCHINVOICE_SRC := plugins/fetchinvoice.c
 PLUGIN_FETCHINVOICE_OBJS := $(PLUGIN_FETCHINVOICE_SRC:.c=.o)
-PLUGIN_FETCHINVOICE_HEADER := 
+PLUGIN_FETCHINVOICE_HEADER :=
+
+PLUGIN_ESPLORA_SRC := plugins/esplora.c
+PLUGIN_ESPLORA_OBJS := $(PLUGIN_ESPLORA_SRC:.c=.o)
 
 PLUGIN_SPENDER_SRC :=				\
 	plugins/spender/fundchannel.c		\
@@ -85,7 +88,8 @@ C_PLUGINS :=					\
 	plugins/offers				\
 	plugins/pay				\
 	plugins/txprepare			\
-	plugins/spenderp
+	plugins/spenderp			\
+	plugins/esplora
 
 PLUGINS := $(C_PLUGINS)
 
