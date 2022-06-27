@@ -16,6 +16,9 @@ PLUGIN_BCLI_OBJS := $(PLUGIN_BCLI_SRC:.c=.o)
 PLUGIN_KEYSEND_SRC := plugins/keysend.c
 PLUGIN_KEYSEND_OBJS := $(PLUGIN_KEYSEND_SRC:.c=.o)
 
+PLUGIN_ESPLORA_SRC := plugins/esplora.c
+PLUGIN_ESPLORA_OBJS := $(PLUGIN_ESPLORA_SRC:.c=.o)
+
 PLUGIN_LIB_SRC := plugins/libplugin.c
 PLUGIN_LIB_HEADER := plugins/libplugin.h
 PLUGIN_LIB_OBJS := $(PLUGIN_LIB_SRC:.c=.o)
@@ -85,7 +88,8 @@ C_PLUGINS :=					\
 	plugins/offers				\
 	plugins/pay				\
 	plugins/txprepare			\
-	plugins/spenderp
+	plugins/spenderp			\
+	plugins/esplora
 
 PLUGINS := $(C_PLUGINS)
 
